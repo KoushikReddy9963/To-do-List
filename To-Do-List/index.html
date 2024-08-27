@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(45deg, #000000, #434343);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .poppins-thin {
+            font-family: "Poppins", sans-serif;
+            font-weight: 100;
+            font-style: normal;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 5%;
+            font-size: 50px;
+        }
+
+        #searchContainer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2%;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            width: 70%;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        input[type="text"]::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 18px;
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #e67e22;
+        }
+
+        #todoList {
+            margin: 20px auto;
+            max-width: 500px;
+        }
+
+        .todoItem {
+            background-color: #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        .todoItem.completed {
+            text-decoration: line-through;
+            color: #ebe7e7;
+        }
+
+        .icons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icons i {
+            cursor: pointer;
+            color: white;
+        }
+
+        .icons i:hover {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+
+<body onload="onreload()">
+    <h1>To-Do List</h1>
+    <div id="searchContainer">
+        <input type="text" placeholder="Enter task.." id="vivek" required />
+        <button id="tharun" onclick="Onsubmit()">Add Task</button>
+    </div>
+    <div id="todoList"></div>
+
+    <script>
+        const inputElement = document.getElementById("vivek");
+
+        function Onsubmit() {
+            const task = inputElement.value;
+            if (task.trim() !== "") {
+                addTodoToDOM(task);
+                saveTask(task);
+                inputElement.value = "";
+            }
+        }
+
+        function addTodoToDOM(task, completed = false) {
+            const div = document.createElement("div");
+            div.classList.add("todoItem");
+            if (completed) {
+                div.classList.add("completed");
+            }
+
+            div.innerHTML = `
+          <span>${task}</span>
+          <div class="icons">
+            <i class="fa-solid fa-check" onclick="toggleComplete(this)"></i>
+            <i class="fa-solid fa-circle-xmark" onclick="removeTask(this)"></i>
+          </div>
+        `;
+            document.getElementById("todoList").appendChild(div);
+        }
+
+        function saveTask(task) {
+            const tasks = JSON.parse(localStorage.getItem("todo")) || [];
+            tasks.push({ task, completed: false });
+            localStorage.setItem("todo", JSON.stringify(tasks));
+        }
+
+        function onreload() {
+            const tasks = JSON.parse(localStorage.getItem("todo")) || [];
+            tasks.forEach(({ task, completed }) => addTodoToDOM(task, completed));
+        }
+
+        function removeTask(element) {
+            const taskElement = element.parentElement.parentElement;
+            const taskName = taskElement.querySelector("span").innerText;
+            taskElement.remove();
+
+            let tasks = JSON.parse(localStorage.getItem("todo"));
+            tasks = tasks.filter(t => t.task !== taskName);
+            localStorage.setItem("todo", JSON.stringify(tasks));
+        }
+
+        function toggleComplete(element) {
+            const taskElement = element.parentElement.parentElement;
+            const taskName = taskElement.querySelector("span").innerText;
+
+            taskElement.classList.toggle("completed");
+
+            let tasks = JSON.parse(localStorage.getItem("todo"));
+            tasks = tasks.map(t => t.task === taskName ? { ...t, completed: !t.completed } : t);
+            localStorage.setItem("todo", JSON.stringify(tasks));
+        }
+    </script>
+</body>
+
+</html>
